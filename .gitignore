@@ -1,0 +1,16 @@
+# Ignore virtualenv dir
+/listing-service/env/
+
+# Ignore SQLite db files
+/listing-service/*.db
+
+# Ignore IDE files
+.idea/
+
+postgres-user-service-data/
+postgres-listing-service-data/
+nats-data/
+
+/*/*.db
+
+/*/.env

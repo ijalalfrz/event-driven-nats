@@ -1,0 +1,8 @@
+# Ignore virtualenv dir
+/listing-service/env/
+
+# Ignore SQLite db files
+/listing-service/*.db
+
+# Ignore IDE files
+.idea/

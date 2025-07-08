@@ -2,7 +2,7 @@
 This is simple project showcasing CQRS pattern in microservices. CQRS is not always related to event sourcing but we can also use this pattern to make dynamic projection model for our data.
 
 ## Prerequisites
-- Go (in this project i use go 1.23.4)
+- Go (in this project i use go v1.23.4)
 - NATS with Jetstream as persistence (inside compose file)
 - docker and docker compose
 - Make to run `Makefile`
@@ -41,6 +41,8 @@ Actually this is my firstime using NATS but i see a lot benefit rather than othe
 
 ### Sequence
 ![Sequence Diagram](sequence.svg)
+
+Every service has it's own databse except `gateway-service` to simulate loose couple in microservice
 
 #### 1. Gateway Service
 - Acts as an API Gateway (BFF Pattern)
@@ -100,3 +102,4 @@ Actually this is my firstime using NATS but i see a lot benefit rather than othe
 # Limitation
 - Compensation event or replying mechanism for fail message is not provided here (i will update in future)
 - Unit & integration test still in progress
+- OpenAPI doc still in progress

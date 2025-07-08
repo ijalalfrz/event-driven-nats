@@ -1,0 +1,128 @@
+services:
+  listing-service:
+    build:
+      context: ./listing-service
+      dockerfile: Dockerfile
+    ports:
+      - 8100:6000
+    environment:
+      - DEBUG=true
+      - PORT=6000
+      - NATS_URL=nats://nats-server:4222
+    volumes:
+      - ./listing-service:/home/myuser/code
+
+  user-service-dev:
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["./scripts/run_server.sh"] 
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile-builder
+    ports:
+      - 8200:3001
+    working_dir: /app
+    tty: true
+    volumes:
+      - ./user-service:/app
+    depends_on:
+      nats-server:
+        condition: service_started
+      postgres-user-service:
+        condition: service_healthy
+  
+  listing-view-service-dev:
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["./scripts/run_server.sh"] 
+    build:
+      context: ./listing-view-service
+      dockerfile: Dockerfile-builder
+    ports:
+      - 8300:3001
+    working_dir: /app
+    tty: true
+    volumes:
+      - ./listing-view-service:/app
+    depends_on:
+      nats-server:
+        condition: service_started
+      postgres-listing-service:
+        condition: service_healthy
+
+  listing-view-service-consumer-dev:
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["./scripts/run_consumer.sh"] 
+    build:
+      context: ./listing-view-service
+      dockerfile: Dockerfile-builder
+    working_dir: /app
+    tty: true
+    volumes:
+      - ./listing-view-service:/app
+    depends_on:
+      nats-server:
+        condition: service_started
+      postgres-listing-service:
+        condition: service_healthy
+  
+  gateway-service-dev:
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["./scripts/run_server.sh"] 
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile-builder
+    ports:
+      - 8400:3001
+    working_dir: /app
+    tty: true
+    volumes:
+      - ./gateway-service:/app
+
+  postgres-user-service:
+    image: postgres:14.5-alpine3.16
+    volumes:
+      - "./postgres-user-service-data:/var/lib/postgresql/data"
+      - "./user-service/db/initdb.d/:/docker-entrypoint-initdb.d/"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_USER: postgres
+      POSTGRES_DB: user_development
+    ports:
+      - "5440:5432"
+    stop_signal: SIGKILL
+    healthcheck:
+      test: pg_isready
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-listing-service:
+    image: postgres:14.5-alpine3.16
+    volumes:
+      - "./postgres-listing-service-data:/var/lib/postgresql/data"
+      - "./listing-view-service/db/initdb.d/:/docker-entrypoint-initdb.d/"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_USER: postgres
+      POSTGRES_DB: listing_development
+    ports:
+      - "5441:5432"
+    stop_signal: SIGKILL
+    healthcheck:
+      test: pg_isready
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  nats-server:
+        image: nats:latest
+        ports:
+          - "4222:4222" # Expose the NATS client port
+          - "8222:8222" # Expose the NATS monitoring port (optional)
+        command: -js 
+        volumes: 
+          - ./nats-data:/data/nats-server
+
+volumes:
+  postgres-user-service-data:
+  postgres-listing-service-data:
+  nats-data:

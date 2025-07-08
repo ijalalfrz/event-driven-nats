@@ -7,6 +7,8 @@ This is simple project showcasing CQRS pattern in microservices. CQRS is not alw
 - docker and docker compose
 - Make to run `Makefile`
 
+**NOTE:** For golang project i use vendorize dependency so we dont need to download dependency again, yes this is intentional.
+
 ## Running this project
 - **All dockerfile for golang in this project is for development purpose**
 - Run in three step
@@ -18,6 +20,7 @@ This is simple project showcasing CQRS pattern in microservices. CQRS is not alw
 ## Assumptions
 - Listing service will scale into different projection data and complex query so i create this pattern to accomodate future scalability.
 - No need real-time data update since it's not critical operation, it is listing. but accessing need fast since we aggregate data from listing and user so need seperate service to accomodate.
+- Trade-off for this pattern is evantual consitency, which is tolerablle for our usecase.
 
 ## Why NATS?
 Actually this is my firstime using NATS but i see a lot benefit rather than other message broker platform. NATS was chosen over others like Kafka for this project for several reasons:
@@ -40,7 +43,7 @@ Actually this is my firstime using NATS but i see a lot benefit rather than othe
 ![Sequence Diagram](sequence.svg)
 
 #### 1. Gateway Service
-- Acts as an API Gateway
+- Acts as an API Gateway (BFF Pattern)
 - Routes requests to appropriate services
 - Handles client communication
 - Uses HTTP for communication with other services

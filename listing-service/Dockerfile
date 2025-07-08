@@ -30,4 +30,4 @@ ENV VIRTUAL_ENV=/home/myuser/venv
 ENV PATH="/home/myuser/venv/bin:$PATH"
 # In your Dockerfile
 ENTRYPOINT ["sh", "-c"]
-CMD ["python main.py --port=${PORT:-6000} --debug=${DEBUG:-true}"]
+CMD ["python main.py --port=${PORT:-6000} --debug=${DEBUG:-true} --nats_url=${NATS_URL:-nats://nats-server:4222}"]

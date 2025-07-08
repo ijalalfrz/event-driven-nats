@@ -18,9 +18,21 @@ class App(tornado.web.Application):
         self.db = sqlite3.connect("listings.db")
         self.db.row_factory = sqlite3.Row
         self.init_db()
+        self.nats_conn = None
+        self.nats_event = "listing.created"
 
-    def init_nats(self, connection_url):
-        self.nats_conn = nats.connect(connection_url)
+    async def init_nats(self, connection_url):
+        try:
+            self.nats_conn = await nats.connect(connection_url)
+            logging.info(f"Connected to NATS at {connection_url}")
+        except Exception as e:
+            logging.error(f"Failed to connect to NATS: {e}")
+            raise
+
+    async def close_nats(self):
+        if self.nats_conn:
+            await self.nats_conn.close()
+            logging.info("NATS connection closed")
 
     def init_db(self):
         cursor = self.db.cursor()
@@ -137,15 +149,20 @@ class ListingsHandler(BaseHandler):
         )
         self.application.db.commit()
 
-        # Publishing the listing to NATS
-        self.application.nats_conn.publish("listings.created", json.dumps({
-            "user_id": user_id_val,
-            "listing_type": listing_type_val,
-            "price": price_val,
-            "created_at": time_now,
-            "updated_at": time_now
-        }))
-
+        if self.application.nats_conn:
+            try:
+                yield self.application.nats_conn.publish(self.application.nats_event, json.dumps({
+                    "id": cursor.lastrowid,
+                    "user_id": user_id_val,
+                    "listing_type": listing_type_val,
+                    "price": price_val,
+                    "created_at": time_now,
+                    "updated_at": time_now
+                }).encode())
+                logging.info("Published listing to NATS")
+            except Exception as e:
+                logging.error(f"Failed to publish to NATS: {e}")
+        
         # Error out if we fail to retrieve the newly created listing
         if cursor.lastrowid is None:
             self.write_json({"result": False, "errors": ["Error while adding listing to db"]}, status_code=500)
@@ -199,69 +216,64 @@ class PingHandler(tornado.web.RequestHandler):
     def get(self):
         self.write("pong!")
 
-def signal_handler(sig, _frame, app, server):
-    """Handle shutdown signals gracefully"""
-    logging.info(f'Received signal {sig}, initiating graceful shutdown...')
-    
-    # Stop accepting new connections
-    server.stop()
-    
-    # Close database connections
-    app.close_db()
-    
-    # Stop the IOLoop after a short delay to allow pending operations to complete
-    io_loop = tornado.ioloop.IOLoop.current()
-    
-    def shutdown():
-        logging.info('Shutting down...')
-        io_loop.stop()
-    
-    # Give it 1 second to finish pending requests
-    io_loop.call_later(1, shutdown)
-
-def make_app(options):
+async def make_app(options):
     app = App([
         (r"/listings/ping", PingHandler),
         (r"/listings", ListingsHandler),
     ], debug=options.debug)
-    app.init_nats(options.nats_url)
-
+    
+    # Initialize NATS connection
+    await app.init_nats(options.nats_url)
+    
     return app
 
 if __name__ == "__main__":
     # Define settings/options for the web app
-    # Specify the port number to start the web app on (default value is port 6000)
     tornado.options.define("port", default=6000)
-    # Specify whether the app should run in debug mode
-    # Debug mode restarts the app automatically on file changes
     tornado.options.define("debug", default=True)
-
-    # Specify the NATS connection URL
     tornado.options.define("nats_url", default="nats://localhost:4222")
 
     # Read settings/options from command line
     tornado.options.parse_command_line()
-
-    # Access the settings defined
     options = tornado.options.options
 
-    # Create web app
-    app = make_app(options)
-    server = app.listen(options.port)
+    async def setup_app():
+        """Setup the app asynchronously"""
+        return await make_app(options)
     
-    # Register signal handlers for graceful shutdown
-    signal.signal(signal.SIGTERM, lambda sig, _frame: signal_handler(sig, _frame, app, server))
-    signal.signal(signal.SIGINT, lambda sig, _frame: signal_handler(sig, _frame, app, server))
-    
-    logging.info("Starting listing service. PORT: {}, DEBUG: {}".format(options.port, options.debug))
-    logging.info("Press Ctrl+C to gracefully shutdown the server")
-
     try:
-        # Start event loop
+        app = tornado.ioloop.IOLoop.current().run_sync(setup_app)
+        server = app.listen(options.port)
+        
+        # Register signal handlers for graceful shutdown
+        def signal_handler(sig, _frame):
+            async def shutdown():
+                logging.info(f'Received signal {sig}, shutting down...')
+                await app.close_nats()
+                app.close_db()
+                server.stop()
+                tornado.ioloop.IOLoop.current().stop()
+            
+            tornado.ioloop.IOLoop.current().add_callback(shutdown)
+        
+        signal.signal(signal.SIGTERM, signal_handler)
+        signal.signal(signal.SIGINT, signal_handler)
+        
+        logging.info("Starting listing service. PORT: {}, DEBUG: {}".format(options.port, options.debug))
+        logging.info("Press Ctrl+C to gracefully shutdown the server")
+
+        # Start event loop (this keeps the server running)
         tornado.ioloop.IOLoop.current().start()
+        
     except KeyboardInterrupt:
         logging.info("Received KeyboardInterrupt, shutting down...")
+    except Exception as e:
+        logging.error(f"Error starting application: {e}")
+        raise
     finally:
-        # Ensure database is closed on exit
-        app.close_db()
+        # Cleanup
+        if 'app' in locals() and app.nats_conn:
+            tornado.ioloop.IOLoop.current().run_sync(app.close_nats)
+        if 'app' in locals():
+            app.close_db()
         logging.info("Listing service shutdown complete")

@@ -2,19 +2,11 @@ package dto
 
 import (
 	"context"
-	"fmt"
 	"net/http"
-	"time"
-
-	"github.com/ijalalfrz/event-driven-nats/listing-view-service/internal/pkg/exception"
-	"github.com/ijalalfrz/event-driven-nats/listing-view-service/internal/pkg/lang"
 )
 
 type RequestContext struct {
-	Signature     string    `mapstructure:"signature"`
-	Language      string    `mapstructure:"language"`
-	Timestamp     time.Time `mapstructure:"timestamp"`
-	TransactionID string    `mapstructure:"transaction_id"`
+	Language string `mapstructure:"language"`
 }
 
 type contextKey string
@@ -26,21 +18,6 @@ func RequestWithContext(req *http.Request) (*http.Request, error) {
 	var reqContext RequestContext
 
 	reqContext.Language = getLanguage(req)
-	reqContext.Signature = getSignature(req)
-
-	transactionID, err := getTransactionID(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get X-TRANSACTION-ID in header: %w", err)
-	}
-
-	reqContext.TransactionID = transactionID
-
-	timestamp, err := getTimestamp(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get X-TIMESTAMP in header: %w", err)
-	}
-
-	reqContext.Timestamp = timestamp
 
 	ctx := context.WithValue(req.Context(), requestContextKey, reqContext)
 
@@ -55,45 +32,4 @@ func RequestFromContext(ctx context.Context) (RequestContext, bool) {
 
 func getLanguage(req *http.Request) string {
 	return req.Header.Get("Accept-Language")
-}
-
-func getSignature(req *http.Request) string {
-	return req.Header.Get("X-Signature")
-}
-
-func getTimestamp(req *http.Request) (time.Time, error) {
-	timestampStr := req.Header.Get("X-Timestamp")
-	if timestampStr == "" {
-		err := exception.ApplicationError{
-			Localizable: lang.Localizable{
-				Message: "X-TIMESTAMP is required in header",
-			},
-			StatusCode: http.StatusBadRequest,
-		}
-
-		return time.Time{}, err
-	}
-
-	timestamp, err := time.Parse(time.RFC3339, timestampStr)
-	if err != nil {
-		return time.Time{}, fmt.Errorf("failed to parse timestamp: %w", err)
-	}
-
-	return timestamp, nil
-}
-
-func getTransactionID(req *http.Request) (string, error) {
-	transactionID := req.Header.Get("X-Transaction-Id")
-	if transactionID == "" {
-		err := exception.ApplicationError{
-			Localizable: lang.Localizable{
-				Message: "X-TRANSACTION-ID is required in header",
-			},
-			StatusCode: http.StatusBadRequest,
-		}
-
-		return "", err
-	}
-
-	return transactionID, nil
 }

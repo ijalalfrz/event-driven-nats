@@ -49,6 +49,9 @@ func (r *UserRepository) CreateTx(ctx context.Context, tx *sql.Tx, user *model.U
 	query := `
 		INSERT INTO users (id, name, created_at, updated_at)
 		VALUES ($1, $2, $3, $4)
+		ON CONFLICT (id) DO UPDATE SET
+			name = $2,
+			updated_at = $4
 	`
 
 	stmt, err := tx.PrepareContext(ctx, query)

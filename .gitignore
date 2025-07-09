@@ -19,3 +19,5 @@ nats-data/
 /*/test/coverage-unit/*
 !/*/test/coverage-unit/.keep
 /*/coverage-unit.out
+
+/*/bin/*

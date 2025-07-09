@@ -20,9 +20,9 @@ This is simple project showcasing CQRS pattern in microservices. CQRS is not alw
 - Run unit test `run-unit-test-[service-name]` e.g. `run-unit-test-user-service`
 
 ## Assumptions
-- Listing service will scale into different projection data and complex query so i create this pattern to accomodate future scalability.
-- No need real-time data update since it's not critical operation, it is listing. but accessing need fast since we aggregate data from listing and user so need seperate service to accomodate.
-- Trade-off for this pattern is evantual consitency, which is tolerablle for our usecase.
+- The Listing service is designed to scale with different data projections and complex queries. This pattern accommodates future scalability needs.
+- Real-time data updates are not critical for listing operations. However, fast access with complex queries is essential since we aggregate data from both listing and user services, justifying a separate service.
+- The main trade-off of this pattern is eventual consistency, which is acceptable for our use case of displaying listings.
 
 ## Why NATS?
 Actually this is my firstime using NATS but i see a lot benefit rather than other message broker platform. NATS was chosen over others like Kafka for this project for several reasons:

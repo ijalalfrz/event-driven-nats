@@ -15,5 +15,7 @@ nats-data/
 
 /*/.env
 
+
+/*/test/coverage-unit/*
+!/*/test/coverage-unit/.keep
 /*/coverage-unit.out
-/*/test/coverage-unit

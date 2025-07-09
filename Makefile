@@ -129,6 +129,13 @@ run-migrate-listing-view-service-down:
 	docker compose -f ${DOCKER_COMPOSE_FILE} exec -t listing-view-service-dev sh -c "./scripts/run_migrate.sh down"
 
 
+run-unit-test-listing-view-service: ## Run unit tests
+run-unit-test-listing-view-service: create-env-file-listing-view-service
+	@echo "=================="
+	@echo "Running unit tests"
+	@echo "=================="
+	${RUN_IN_DOCKER} listing-view-service-dev sh -c "./scripts/unit_test.sh"
+
 
 #=====================#
 #== NATS Server ==#

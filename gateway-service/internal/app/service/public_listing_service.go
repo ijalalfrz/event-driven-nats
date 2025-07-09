@@ -25,6 +25,17 @@ func NewPublicListingService(
 	}
 }
 
+// CreateListing godoc
+// @Summary      Create Listing
+// @Description  Create a Listing
+// @Tags         Listing
+// @ID           createListing
+// @Produce      json
+// @Param        req body create listing	body		dto.CreateListingRequest	true	"Listing"
+// @Success      200  {object}  dto.CreateListingResponse	"Created"
+// @Failure      400  {object}  dto.ErrorResponse	"Bad Request"
+// @Failure      500  {object}  dto.ErrorResponse	"Internal Server Error"
+// @Router       /public/listings [post].
 func (s *PublicListingService) CreateListing(ctx context.Context,
 	request dto.CreateListingRequest,
 ) (dto.CreateListingResponse, error) {
@@ -41,6 +52,17 @@ func (s *PublicListingService) CreateListing(ctx context.Context,
 	return response, nil
 }
 
+// GetAllListings godoc
+// @Summary      Get All Listings
+// @Description  Get All Listings
+// @Tags         Listing
+// @ID           getAllListings
+// @Produce      json
+// @Param        req body get all listings	body		dto.GetAllListingsRequest	true	"Listing"
+// @Success      200  {object}  dto.GetAllListingsResponse	"Listings"
+// @Failure      400  {object}  dto.ErrorResponse	"Bad Request"
+// @Failure      500  {object}  dto.ErrorResponse	"Internal Server Error"
+// @Router       /public/listings [get].
 func (s *PublicListingService) GetAllListings(ctx context.Context,
 	request dto.GetAllListingsRequest,
 ) (dto.GetAllListingsResponse, error) {

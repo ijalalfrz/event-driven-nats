@@ -4,11 +4,11 @@ import (
 	"github.com/ijalalfrz/event-driven-nats/gateway-service/cmd/app"
 )
 
-// @title           Go Event Source API
+// @title           Gateway Service
 // @version         1.0.0
-// @description     balance transfer simulation with event sourcing database schema
+// @description     Gateway Service for the Event Driven Architecture
 
-// @host      localhost:8080
+// @host      localhost:8400
 // @BasePath  /
 // @license.name Ijal Alfarizi
 // @license.url https://techwithrizal.com

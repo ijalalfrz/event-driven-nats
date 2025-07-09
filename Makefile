@@ -44,7 +44,7 @@ docker-stop-user-service:
 	@echo "=========================="
 	@echo "Stopping Docker Containers"
 	@echo "=========================="
-	docker compose -f ${DOCKER_COMPOSE_FILE} stop user-service-dev
+	docker compose -f ${DOCKER_COMPOSE_FILE} stop user-service-dev postgres-user-service
 	docker compose -f ${DOCKER_COMPOSE_FILE} ps
 
 clean-user-service-db:
@@ -64,6 +64,12 @@ run-migrate-user-service-down:
 	docker compose -f ${DOCKER_COMPOSE_FILE} exec -t user-service-dev sh -c "./scripts/run_migrate.sh down"
 
 
+run-unit-test-user-service: ## Run unit tests
+run-unit-test-user-service: create-env-file-user-service
+	@echo "=================="
+	@echo "Running unit tests"
+	@echo "=================="
+	${RUN_IN_DOCKER} user-service-dev sh -c "./scripts/unit_test.sh"
 
 #=====================#
 #== Listing View Service ==#
@@ -98,7 +104,7 @@ docker-stop-listing-view-service:
 	@echo "=========================="
 	@echo "Stopping Docker Containers"
 	@echo "=========================="
-	docker compose -f ${DOCKER_COMPOSE_FILE} stop listing-view-service-dev
+	docker compose -f ${DOCKER_COMPOSE_FILE} stop listing-view-service-dev postgres-listing-service
 	docker compose -f ${DOCKER_COMPOSE_FILE} ps
 
 docker-stop-listing-view-service-consumer:
@@ -123,6 +129,13 @@ run-migrate-listing-view-service-down:
 	docker compose -f ${DOCKER_COMPOSE_FILE} exec -t listing-view-service-dev sh -c "./scripts/run_migrate.sh down"
 
 
+run-unit-test-listing-view-service: ## Run unit tests
+run-unit-test-listing-view-service: create-env-file-listing-view-service
+	@echo "=================="
+	@echo "Running unit tests"
+	@echo "=================="
+	${RUN_IN_DOCKER} listing-view-service-dev sh -c "./scripts/unit_test.sh"
+
 
 #=====================#
 #== NATS Server ==#
@@ -131,7 +144,9 @@ run-migrate-listing-view-service-down:
 run-nats-server:
 	docker compose -f ${DOCKER_COMPOSE_FILE} up nats-server -d --build --remove-orphans
 
-
+run-postgres-server-all:
+	docker compose -f ${DOCKER_COMPOSE_FILE} up postgres-user-service postgres-listing-service -d --build --remove-orphans
+	
 
 
 #=====================#
@@ -173,8 +188,26 @@ docker-restart-gateway-service: docker-stop-gateway-service docker-start-gateway
 environment-gateway-service: create-env-file-gateway-service \
 	docker-restart-gateway-service build-gateway-service
 
+run-unit-test-gateway-service: ## Run unit tests
+run-unit-test-gateway-service: create-env-file-gateway-service
+	@echo "=================="
+	@echo "Running unit tests"
+	@echo "=================="
+	${RUN_IN_DOCKER} gateway-service-dev sh -c "./scripts/unit_test.sh"
 
-environment-all: environment-user-service environment-listing-view-service environment-gateway-service
+
+clean-nats-data:
+	rm -rf nats-data
+
+environment-all: clean-nats-data environment-user-service environment-listing-view-service\
+	 environment-gateway-service run-postgres-server-all run-nats-server
 migrate-all: run-migrate-user-service-up run-migrate-listing-view-service-up
 run-all: docker-start-listing-service run-user-service run-listing-view-service \
 	run-listing-view-service-consumer run-gateway-service
+
+api-docs-gateway-service: ## Generate API docs with swaggo
+	@echo "========================="
+	@echo "Generate Swagger API Docs"
+	@echo "========================="
+	go install github.com/swaggo/swag/cmd/swag@latest
+	swag init --parseDependency --parseInternal -g gateway-service/cmd/main.go -ot "json" --output docs/gateway-service

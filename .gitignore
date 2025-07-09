@@ -14,3 +14,8 @@ nats-data/
 /*/*.db
 
 /*/.env
+
+
+/*/test/coverage-unit/*
+!/*/test/coverage-unit/.keep
+/*/coverage-unit.out

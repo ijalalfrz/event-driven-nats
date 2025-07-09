@@ -90,7 +90,12 @@ func (r *ListingRepository) CreateTx(ctx context.Context, tx *sql.Tx, listing *m
 	query := `
 		INSERT INTO listings (id, user_id, listing_type, price, user_detail, created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
-		RETURNING id
+		ON CONFLICT (id) DO UPDATE SET
+			user_id = $2,
+			listing_type = $3,
+			price = $4,
+			user_detail = $5,
+			updated_at = $7
 	`
 
 	userDetail, err := json.Marshal(listing.User)

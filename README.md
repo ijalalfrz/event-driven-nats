@@ -16,6 +16,7 @@ This is simple project showcasing CQRS pattern in microservices. CQRS is not alw
     - `make migrate-all` to run database migrataion for all service
     - `make run-all` run detached container for all service
 - Specific command can be found in `Makefile`
+- Generate api doc for `gateway service` using `make api-docs-gateway-service`
 
 ## Assumptions
 - Listing service will scale into different projection data and complex query so i create this pattern to accomodate future scalability.
@@ -73,7 +74,7 @@ Every service has it's own databse except `gateway-service` to simulate loose co
 - Handles event distribution
 - Provides persistence for events
 
-### Architectural Patterns
+## Architectural Patterns
 
 #### Event-Driven Architecture
 - Services communicate through events

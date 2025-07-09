@@ -4,11 +4,11 @@ import (
 	"github.com/ijalalfrz/event-driven-nats/user-service/cmd/app"
 )
 
-// @title           Go Event Source API
+// @title           User Service
 // @version         1.0.0
-// @description     balance transfer simulation with event sourcing database schema
+// @description     User Service for the Event Driven Architecture
 
-// @host      localhost:8080
+// @host      localhost:8100
 // @BasePath  /
 // @license.name Ijal Alfarizi
 // @license.url https://techwithrizal.com

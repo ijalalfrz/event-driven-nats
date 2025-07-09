@@ -1,0 +1,289 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Gateway Service for the Event Driven Architecture",
+        "title": "Gateway Service",
+        "contact": {},
+        "license": {
+            "name": "Ijal Alfarizi",
+            "url": "https://techwithrizal.com"
+        },
+        "version": "1.0.0"
+    },
+    "host": "localhost:8400",
+    "basePath": "/",
+    "paths": {
+        "/public/listings": {
+            "get": {
+                "description": "Get All Listings",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Listing"
+                ],
+                "summary": "Get All Listings",
+                "operationId": "getAllListings",
+                "parameters": [
+                    {
+                        "description": "Listing",
+                        "name": "listings",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_ijalalfrz_event-driven-nats_gateway-service_internal_app_dto.GetAllListingsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Listings",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_ijalalfrz_event-driven-nats_gateway-service_internal_app_dto.GetAllListingsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_ijalalfrz_event-driven-nats_gateway-service_internal_app_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_ijalalfrz_event-driven-nats_gateway-service_internal_app_dto.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a Listing",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Listing"
+                ],
+                "summary": "Create Listing",
+                "operationId": "createListing",
+                "parameters": [
+                    {
+                        "description": "Listing",
+                        "name": "listing",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_ijalalfrz_event-driven-nats_gateway-service_internal_app_dto.CreateListingRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_ijalalfrz_event-driven-nats_gateway-service_internal_app_dto.CreateListingResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_ijalalfrz_event-driven-nats_gateway-service_internal_app_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_ijalalfrz_event-driven-nats_gateway-service_internal_app_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/public/users": {
+            "post": {
+                "description": "Create a User",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Create User",
+                "operationId": "createUser",
+                "parameters": [
+                    {
+                        "description": "User",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_ijalalfrz_event-driven-nats_gateway-service_internal_app_dto.CreateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_ijalalfrz_event-driven-nats_gateway-service_internal_app_dto.CreateUserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_ijalalfrz_event-driven-nats_gateway-service_internal_app_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_ijalalfrz_event-driven-nats_gateway-service_internal_app_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "github_com_ijalalfrz_event-driven-nats_gateway-service_internal_app_dto.CreateListingRequest": {
+            "type": "object",
+            "required": [
+                "listing_type",
+                "price",
+                "user_id"
+            ],
+            "properties": {
+                "listing_type": {
+                    "type": "string",
+                    "enum": [
+                        "rent",
+                        "sale"
+                    ]
+                },
+                "price": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_ijalalfrz_event-driven-nats_gateway-service_internal_app_dto.CreateListingResponse": {
+            "type": "object",
+            "properties": {
+                "listing": {
+                    "$ref": "#/definitions/github_com_ijalalfrz_event-driven-nats_gateway-service_internal_app_dto.ListingResponse"
+                }
+            }
+        },
+        "github_com_ijalalfrz_event-driven-nats_gateway-service_internal_app_dto.CreateUserRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_ijalalfrz_event-driven-nats_gateway-service_internal_app_dto.CreateUserResponse": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "$ref": "#/definitions/github_com_ijalalfrz_event-driven-nats_gateway-service_internal_app_dto.UserResponse"
+                }
+            }
+        },
+        "github_com_ijalalfrz_event-driven-nats_gateway-service_internal_app_dto.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "result": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "github_com_ijalalfrz_event-driven-nats_gateway-service_internal_app_dto.GetAllListingsRequest": {
+            "type": "object",
+            "required": [
+                "page_number",
+                "page_size",
+                "user_id"
+            ],
+            "properties": {
+                "page_number": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "page_size": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_ijalalfrz_event-driven-nats_gateway-service_internal_app_dto.GetAllListingsResponse": {
+            "type": "object",
+            "properties": {
+                "listings": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_ijalalfrz_event-driven-nats_gateway-service_internal_app_dto.ListingResponse"
+                    }
+                },
+                "result": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "github_com_ijalalfrz_event-driven-nats_gateway-service_internal_app_dto.ListingResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "listing_type": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "integer"
+                },
+                "user": {
+                    "$ref": "#/definitions/github_com_ijalalfrz_event-driven-nats_gateway-service_internal_app_dto.UserResponse"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_ijalalfrz_event-driven-nats_gateway-service_internal_app_dto.UserResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}

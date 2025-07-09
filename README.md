@@ -105,3 +105,9 @@ Every service has it's own databse except `gateway-service` to simulate loose co
 - Compensation event or replying mechanism for fail message is not provided here (i will update in future)
 - Unit & integration test still in progress
 - OpenAPI doc still in progress
+
+
+# Future Improvment
+- Handling compensation event
+- Distributed tracing is critical in microservice architecture, will add Grafana stack in this project
+- CI pipeline

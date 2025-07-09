@@ -73,7 +73,7 @@ Every service has it's own databse except `gateway-service` to simulate loose co
 - Handles event distribution
 - Provides persistence for events
 
-### Architectural Patterns
+## Architectural Patterns
 
 #### Event-Driven Architecture
 - Services communicate through events

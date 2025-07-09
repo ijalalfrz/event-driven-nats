@@ -64,6 +64,12 @@ run-migrate-user-service-down:
 	docker compose -f ${DOCKER_COMPOSE_FILE} exec -t user-service-dev sh -c "./scripts/run_migrate.sh down"
 
 
+run-unit-test-user-service: ## Run unit tests
+run-unit-test-user-service: create-env-file-user-service
+	@echo "=================="
+	@echo "Running unit tests"
+	@echo "=================="
+	${RUN_IN_DOCKER} user-service-dev sh -c "./scripts/unit_test.sh"
 
 #=====================#
 #== Listing View Service ==#

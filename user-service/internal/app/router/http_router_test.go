@@ -42,21 +42,21 @@ func TestConfigRoute(t *testing.T) {
 			shouldMatch: true,
 		},
 		{
-			name:        "Create Account",
+			name:        "Create User",
 			method:      http.MethodPost,
-			path:        "/accounts",
+			path:        "/users",
 			shouldMatch: true,
 		},
 		{
-			name:        "Get Account",
+			name:        "Get User By ID",
 			method:      http.MethodGet,
-			path:        "/accounts/1",
+			path:        "/users/1",
 			shouldMatch: true,
 		},
 		{
-			name:        "Create Transfer",
-			method:      http.MethodPost,
-			path:        "/transactions",
+			name:        "Get All Users",
+			method:      http.MethodGet,
+			path:        "/users",
 			shouldMatch: true,
 		},
 	}

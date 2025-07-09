@@ -3,7 +3,6 @@
 # have to use postgres (super user) because test-fixtures need to disable system triggers
 # when loading test fixtures
 # use test DB
-export DB_DSN=postgres://postgres@postgres/transaction_test?sslmode=disable
 export LOG_LEVEL=debug
 export GOCOVERDIR=test/coverage
 

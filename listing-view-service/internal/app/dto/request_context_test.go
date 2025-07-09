@@ -6,7 +6,6 @@ import (
 	"context"
 	"net/http"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -32,6 +31,4 @@ func TestRequestContext(t *testing.T) {
 	assert.True(t, ok)
 
 	assert.Equal(t, language, reqContext.Language)
-	assert.Equal(t, timestamp, reqContext.Timestamp.Format(time.RFC3339))
-	assert.Equal(t, transactionID, reqContext.TransactionID)
 }

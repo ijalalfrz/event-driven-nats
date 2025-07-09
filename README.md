@@ -17,6 +17,7 @@ This is simple project showcasing CQRS pattern in microservices. CQRS is not alw
     - `make run-all` run detached container for all service
 - Specific command can be found in `Makefile`
 - Generate api doc for `gateway service` using `make api-docs-gateway-service`
+- Run unit test `run-unit-test-[service-name]` e.g. `run-unit-test-user-service`
 
 ## Assumptions
 - Listing service will scale into different projection data and complex query so i create this pattern to accomodate future scalability.

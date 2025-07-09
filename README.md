@@ -107,6 +107,7 @@ Every service has it's own databse except `gateway-service` to simulate loose co
 - OpenAPI doc still in progress
 
 
-# Future improvment
+# Future Improvment
 - Handling compensation event
 - Distributed tracing is critical in microservice architecture, will add Grafana stack in this project
+- CI pipeline

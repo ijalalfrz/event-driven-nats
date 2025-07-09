@@ -186,6 +186,14 @@ docker-restart-gateway-service: docker-stop-gateway-service docker-start-gateway
 environment-gateway-service: create-env-file-gateway-service \
 	docker-restart-gateway-service build-gateway-service
 
+run-unit-test-gateway-service: ## Run unit tests
+run-unit-test-gateway-service: create-env-file-gateway-service
+	@echo "=================="
+	@echo "Running unit tests"
+	@echo "=================="
+	${RUN_IN_DOCKER} gateway-service-dev sh -c "./scripts/unit_test.sh"
+
+
 
 environment-all: environment-user-service environment-listing-view-service environment-gateway-service
 migrate-all: run-migrate-user-service-up run-migrate-listing-view-service-up

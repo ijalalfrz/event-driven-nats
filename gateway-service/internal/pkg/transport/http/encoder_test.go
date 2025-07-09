@@ -19,7 +19,7 @@ func TestEncodeError(t *testing.T) {
 	ErrorResponse(context.Background(), errors.New("internal error"), resp)
 
 	assert.Equal(t, http.StatusInternalServerError, resp.Code)
-	assert.JSONEq(t, `{"error": "internal error"}`, resp.Body.String())
+	assert.JSONEq(t, `{"error": "internal error", "result":false}`, resp.Body.String())
 }
 
 func TestEncodeErrorCustomError(t *testing.T) {
@@ -32,7 +32,7 @@ func TestEncodeErrorCustomError(t *testing.T) {
 	ErrorResponse(context.Background(), err, resp)
 
 	assert.Equal(t, http.StatusBadRequest, resp.Code)
-	assert.JSONEq(t, `{"error": "invalid request"}`, resp.Body.String())
+	assert.JSONEq(t, `{"error": "invalid request", "result":false}`, resp.Body.String())
 }
 
 func TestEncodeJSONResponse(t *testing.T) {
